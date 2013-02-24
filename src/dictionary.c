@@ -407,21 +407,47 @@ lookup * pfind( dict *dictionary, char *s){
 
 bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
 
-        int i;
+        int i,j;
         int num_children;
-        void ** children ;
+        void ** children = NULL;
+        void ** merge_children = NULL;
+        void ** moving_children = NULL;
+        trienode *merge_child = NULL;
+        int merge_num = 0;
         int match_index = strcmp2(root->value, s);
         if(match_index == STRCMP_EXACT_MATCH){
                 if(root->is_word){
                         root->is_word = FALSE;
                         //Mark the current node for removal if it has no children
-                        if(trie_num_children(root) == 0){
+                        num_children = trie_num_children(root);
+                        if(num_children == 0){
                                 log("Exact match found, setting myself here");
                                 *child_to_rm = root;
+                        }
+                        else if (num_children == 1){
+                                //Reconcile 
+                                merge_children = trie_get_children(root);	
+                                merge_child = merge_children[0];
+                                moving_children = trie_get_children(merge_child);
+                                merge_num = trie_num_children(merge_child);
+                                for(j=0; j < merge_num; j++){
+                                        trie_remove_child(merge_child, moving_children[j]);
+                                        trie_add_child(root, moving_children[j]);
+                                }
+                                //Concatenate strings
+                                strjoin(&(root->value), merge_child->value);
+                                root->is_word = merge_child->is_word;
+                                trie_remove_child(root, merge_child);
+                                trie_freenode(merge_child);
+                                xfree(merge_children);
+                                xfree(moving_children);
+                                *child_to_rm = NULL;
+
                         }
                         else{
                                 *child_to_rm = NULL;
                         }
+
                         return SUCCESS;
                 }
                 else{
@@ -452,11 +478,13 @@ bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
                                                         int merge_num = trie_num_children(merge_child);
                                                         int j;
                                                         for(j=0; j < merge_num; j++){
-                                                                trie_remove_child(merge_child, moving_children[i]);
-                                                                trie_add_child(root, moving_children[i]);
+                                                                trie_remove_child(merge_child, moving_children[j]);
+                                                                trie_add_child(root, moving_children[j]);
                                                         }
                                                         //Concatenate strings
+                                                        log("Root value before merge [%s] child value [%s]\n", root->value, merge_child->value);
                                                         strjoin(&(root->value), merge_child->value);
+                                                        log("Root value after merge [%s] child value [%s]\n", root->value, merge_child->value);
                                                         root->is_word = merge_child->is_word;
                                                         trie_remove_child(root, merge_child);
                                                         trie_freenode(merge_child);
@@ -487,7 +515,7 @@ bool remove_word ( dict *dictionary, char *s){
 
         for( i=0; i<num_children; i++){
                 if(_remove_recur((trienode *)roots[i], s, &temp) ){
-                        if(temp != NULL && temp == roots[i]){
+                        if(temp != NULL){
                                 trie_remove_child(dictionary->root, temp);
                                 log("Removing the child here");
                                 trie_freenode(temp);

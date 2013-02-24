@@ -8,7 +8,7 @@ typedef struct {
         ll * children;
         int num_strings;
         char * value;
-        char is_word;
+        bool is_word;
 
 }trienode;
 

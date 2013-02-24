@@ -11,7 +11,6 @@ typedef struct list_node {
 
 typedef struct linkedlist{
         ll_node * head;
-        ll_node * tail;
         int len;
 }ll;
 
