@@ -191,7 +191,7 @@ int word_count(dict *dictionary){
         }
         return (dictionary->root->num_strings = count);
 }
-bool _find_recur(trienode * root, char *s, lookup * result){
+bool _find_recur(trienode * root, char *s){
 
         int i;
         void ** children ;
@@ -210,7 +210,7 @@ bool _find_recur(trienode * root, char *s, lookup * result){
                         children = trie_get_children(root);
 
                         for (i=0; i< trie_num_children(root); i++){
-                                if(_find_recur((trienode *)children[i], s+match_index+1, result)){
+                                if(_find_recur((trienode *)children[i], s+match_index+1)){
                                         return SUCCESS;
                                 }
                         }
@@ -230,11 +230,141 @@ bool find (dict * dictionary, char * s){
         int num_children = trie_num_children(dictionary->root);
 
         for( i=0; i<num_children; i++){
-                if(_find_recur((trienode *)roots[i], s, NULL)){
+                if(_find_recur((trienode *)roots[i], s)){
                         return SUCCESS;
                 }
         }
         return FAILURE;
 }
 
+void _fill_strings_recur (trienode * root, void ** strings, int remaining){
 
+        int i;
+        void **children ;
+
+        for( i=0; i < remaining; i++){
+                strcpy((char *)strings[i] + strlen(strings[i]), root->value);
+        }
+        children  = trie_get_children(root);
+        if(children == NULL){
+                return;
+        }
+        if(root->is_word && root->num_strings > 1){
+                for(i=0; i < trie_num_children(root); i++){
+                        _fill_strings_recur( (trienode *)children[i], (void **)((void *)strings + 1), remaining -1);
+                }
+        }
+        else{
+                for(i=0; i < trie_num_children(root); i++){
+                        _fill_strings_recur( (trienode *)children[i], strings, remaining);
+                }
+        }
+
+        return;
+}
+
+void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
+        int i;
+        void ** children ;
+        int match_index = strcmp2(root->value, s+s_start);
+        if(match_index == STRCMP_EXACT_MATCH){
+                //Populate string counts and return if 0
+                if(_num_strings_in_subtree_recur(root) == 0){
+                        return;
+                }
+                
+                //Allocate memory for the prefixes
+                result->matches = (void **)malloc(sizeof(char *) * root->num_strings);
+                result->len = root->num_strings;
+                //Append whole string so far
+                for(i=0; i< root->num_strings; i++){
+                        result->matches[i] = (void *)malloc(sizeof(char) *MAX_WORD_SIZE);
+                        strcpy(result->matches[i], s);
+                }
+
+                children  = trie_get_children(root);
+                if(root->is_word && root->num_strings > 1){
+                        for(i=0; i < trie_num_children(root); i++){
+                                _fill_strings_recur( (trienode *)children[i], (void **)((void *)result->matches + 1), result->len -1);
+                        }
+                }
+                else{
+                        for(i=0; i < trie_num_children(root); i++){
+                                _fill_strings_recur( (trienode *)children[i], result->matches , result->len );
+                        }
+                }
+        }
+        else if (match_index == STRCMP_NO_MATCH){
+                log("No match found for %s at node %s\n", s+s_start, root->value);
+                return;
+        }
+        else{
+                log("LOG1 match index is [%d] and s_start is [%d] and strlen(s) is [%d] \n"
+                                ,match_index, s_start, strlen(s));
+                if(match_index == strlen(root->value) -1){
+                        log("LOG1");
+                        children = trie_get_children(root);
+
+                        for (i=0; i< trie_num_children(root); i++){
+                                _pfind_recur((trienode *)children[i], s, match_index+1, result);
+                                        return ;
+                        }
+                        return;
+                }
+                else if(match_index +1  == strlen(s) - s_start){
+                        log("LOG2");
+                        //if the passed prefix from above was a prefix of root->value
+                         //Populate string counts and return if 0
+                        if(_num_strings_in_subtree_recur(root) == 0){
+                                return;
+                        }
+                        
+                        //Allocate memory for the prefixes
+                        result->matches = (void **)malloc(sizeof(char *) * root->num_strings);
+                        result->len = root->num_strings;
+                        //Append whole string so far
+                        for(i=0; i< root->num_strings; i++){
+                                result->matches[i] = (void *)malloc(sizeof(char) *MAX_WORD_SIZE);
+                                //Copy part of s and root->value
+                                strncpy(result->matches[i], s, s_start);
+                                strcpy((char *)result->matches[i] + s_start, root->value);
+                        }
+
+                        children  = trie_get_children(root);
+                        if(root->is_word && root->num_strings > 1){
+                                for(i=0; i < trie_num_children(root); i++){
+                                        _fill_strings_recur( (trienode *)children[i], (void **)((void *)result->matches + 1), result->len -1);
+                                }
+                        }
+                        else{
+                                for(i=0; i < trie_num_children(root); i++){
+                                        _fill_strings_recur( (trienode *)children[i], result->matches , result->len );
+                                }
+                        }       
+                }
+        }
+        return;
+
+}
+
+lookup * pfind( dict *dictionary, char *s){
+        if(dictionary == NULL || s == NULL){
+                return FAILURE;
+        }
+        
+        int i;
+        void ** roots = trie_get_children(dictionary->root);
+        int num_children = trie_num_children(dictionary->root);
+        lookup * temp = malloc(sizeof(lookup));
+        temp->len = 0;
+        temp->matches = NULL;
+
+        for( i=0; i<num_children; i++){
+                _pfind_recur((trienode *)roots[i], s, 0, temp);
+                if(temp->len > 0){
+                        return temp;
+                }
+        }
+        return temp;
+}
+       

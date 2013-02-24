@@ -7,6 +7,7 @@ int main(int argc, char **argv){
         dict *mydict = new_dictionary();
         log("The limits of the allocated word are %p %p MAX_WORD_SIZE is %d\n", input_word, input_word + MAX_WORD_SIZE + 1, MAX_WORD_SIZE);
         int len = 0;
+        int i;
         if(isatty(fileno(stdin))){
                 printf("> ");
         }
@@ -20,29 +21,38 @@ int main(int argc, char **argv){
                                 insert(mydict, input_word, len-1);
                                 break;
                         case DICT_LOOKUP_OP:
-                                printf("Dictionary lookup operation found with word : %s\n", input_word);
+                                log("Dictionary lookup operation found with word : %s\n", input_word);
                                 if(find(mydict, input_word)){
-                                        printf("Word is present\n");
+                                        printf("[%s] is present\n", input_word);
                                 }
                                 else{
-                                        printf("Word not found\n");
+                                        printf("[%s] not found\n", input_word);
                                 }
                                 break;
                         case DICT_PREFIX_OP:
-                                printf("Dictionary prefix operation found with word : %s\n", input_word);
+                                log("Dictionary prefix operation found with word : %s\n", input_word);
+                                lookup *  result = pfind(mydict, input_word);
+                                if(result->len > 0){
+                                        for(i = 0; i< result->len; i++){
+                                                printf("[%s] matches [%s]\n", result->matches[i], input_word);
+                                        }
+                                }
+                                else{
+                                        printf("No matches found");
+                                }
                                 break;
                         case DICT_REMOVE_OP:
-                                printf("Dictionary remove operation found with word : %s\n", input_word);
+                                log("Dictionary remove operation found with word : %s\n", input_word);
                                 break;
                         case DICT_PRINTT_OP:
-                                printf("Dictionary printt operation found with word : %s\n", input_word);
+                                log("Dictionary printt operation found with word : %s\n", input_word);
                                 print(mydict);
                                 break;
                         case DICT_INVALID_OP:
-                                printf("Dictionary invalid operation found\n");
+                                log("Dictionary invalid operation found\n");
                                 break;
                         default:
-                                printf("parse_input returned invalid code\n");
+                                log("parse_input returned invalid code\n");
                 }
                 if(isatty(fileno(stdin))){
                         printf("> ");

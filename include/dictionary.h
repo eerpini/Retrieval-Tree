@@ -20,8 +20,10 @@ void    _print_words_recur      (trienode *, int);
 void    print                   (dict *);
 int     _num_strings_in_subtree_recur (trienode *);
 int     word_count              (dict *);
-bool    _find_recur             (trienode *, char *, lookup *);
+bool    _find_recur             (trienode *, char *);
 bool    find                    (dict *, char *);
+lookup *pfind                   (dict *, char *);
+void    _pfind_recur            (trienode *, char *, int, lookup *);
 
 
 #endif
