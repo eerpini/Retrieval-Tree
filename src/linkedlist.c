@@ -1,10 +1,10 @@
 #include "linkedlist.h"
 
-void _free_node (ll_node * node){
+void _free_node (ll_node * node, bool FREE_DATA){
         if(node == NULL){
                 return;
         }
-        if(node->data != NULL){
+        if(node->data != NULL && FREE_DATA){
                 free(node->data);
         }
         printf("FREEING THE NODE ATTEMPTED");
@@ -30,7 +30,7 @@ void ll_free (ll * list){
         ll_node * next = temp;
         while(temp != NULL){
                 next = temp->next;
-                _free_node(temp);
+                _free_node(temp, TRUE);
                 temp = next;
         }
         free(list);
@@ -57,10 +57,10 @@ void ll_add(ll * list, void *data){
         return;
 }
         
-int ll_remove(ll * list , void *data){
+int ll_remove(ll * list , void *data, bool FREE_DATA){
 
         if(list->head == NULL){
-                return -1;
+                return FAILURE;
         }
 
         ll_node *temp = NULL;
@@ -71,9 +71,9 @@ int ll_remove(ll * list , void *data){
                 if(list->head->data == data){
                         temp = list->head;
                         list->head = list->tail = NULL;
-                        _free_node(temp);
+                        _free_node(temp, FREE_DATA);
                         list->len--;
-                        return 0;
+                        return SUCCESS;
 
                 }
                 return -1;
@@ -87,31 +87,31 @@ int ll_remove(ll * list , void *data){
         }
 
         if(temp == NULL){
-                return -1;
+                return FAILURE;
         }
 
         if(temp == list->head){
                 list->head = list->head->next;
-                _free_node(temp);
+                _free_node(temp, FREE_DATA);
                 list->len--;
-                return 0;
+                return SUCCESS;
         }
 
         if(temp == list->tail){
                 list->tail = prev;
                 list->tail->next = NULL;
-                _free_node(temp);
+                _free_node(temp, FREE_DATA);
                 list->len--;
-                return 0;
+                return SUCCESS;
         }
 
         prev->next = temp->next;
-        _free_node(temp);
+        _free_node(temp, FREE_DATA);
         list->len--;
-        return 0;
+        return SUCCESS;
 }
 
-void ** get_nodes (ll *list){
+void ** ll_get_nodes (ll *list){
         if(list->head == NULL){
                 return NULL;
         }

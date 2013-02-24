@@ -18,12 +18,15 @@ typedef struct retrieval_tree {
         int num_strings;
 }trie;
 
-trie * create_trie ();
-trienode * create_trienode (char *);
-int add_child(trienode* );
-void remove_child(trienode *);
-int get_children(trienode *);
+typedef trie dict;
 
+trie *          trie_create             ();
+trienode *      trie_createnode         (char *);
+void            trie_freenode           (trienode *);
+void            trie_add_child          (trienode *, trienode* );
+int             trie_remove_child       (trienode *, trienode *);
+//Return an array of pointers to the child trienodes
+void **         trie_get_children       (trienode *);
 
 #endif
 
