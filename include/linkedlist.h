@@ -21,5 +21,6 @@ void ll_free(ll *);
 void ll_add(ll *, void *);
 int ll_remove(ll *, void *, bool);
 void ** ll_get_nodes(ll *);
+int ll_length(ll *);
 
 #endif

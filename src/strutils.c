@@ -21,6 +21,7 @@ int strcmp2(char *s1, char *s2){
                 if(s1[i] != s2[i]){
                         break;
                 }
+                i++;
         }
 
         //No matching character
@@ -35,7 +36,30 @@ int strcmp2(char *s1, char *s2){
         return i-1;
 
 }
+/*
+ * A String split function, creates two new strings
+ * the prefix is still at str but with pref_len 
+ * the second half is returned
+ * all strings are null terminated
+ */
+char * strsplit (char **str, int pref_len){
+        int curr_len = strlen(*str);
+        
+        char * prefix = malloc (sizeof(char) * (pref_len + 1));
+        char * suffix = malloc (sizeof(char) * (curr_len - pref_len + 1));
 
+        strncpy(prefix, *str, pref_len);
+        prefix[pref_len] = 0;
+
+        strncpy(suffix, (*str)+pref_len, curr_len - pref_len);
+        suffix[curr_len - pref_len] = 0;
+
+        free(*str);
+        *str = prefix;
+
+        return suffix;
+
+}
         
 
 

@@ -59,7 +59,7 @@ void ll_add(ll * list, void *data){
         
 int ll_remove(ll * list , void *data, bool FREE_DATA){
 
-        if(list->head == NULL){
+        if(list == NULL || list->head == NULL || data == NULL){
                 return FAILURE;
         }
 
@@ -126,3 +126,9 @@ void ** ll_get_nodes (ll *list){
         return (void **)(return_set);
 }
 
+int ll_length(ll *list){
+        if(list == NULL){
+                return FAILURE;
+        }
+        return list->len;
+}

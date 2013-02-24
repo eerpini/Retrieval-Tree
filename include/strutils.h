@@ -11,5 +11,6 @@
 #define STRCMP_EXACT_MATCH 207
 
 int strcmp2(char *, char *);
+char * strsplit (char **, int);
 
 #endif

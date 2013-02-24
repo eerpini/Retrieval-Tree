@@ -13,6 +13,7 @@ extern int _cmd_len;
 #define DICT_LOOKUP_CMD "lookup"
 #define DICT_PREFIX_CMD "prefix"
 #define DICT_REMOVE_CMD "remove"
+#define DICT_PRINTT_CMD "printt"
 #define DICT_EXPORT_CMD "export"
 
 //Insert word into the dictionary
@@ -23,15 +24,17 @@ extern int _cmd_len;
 #define DICT_PREFIX_OP 109
 //Remove word from the dictionary
 #define DICT_REMOVE_OP 110
+//Print the words in the dictionary as a tree
+#define DICT_PRINTT_OP 111
 //Export the contents of the dictionary into a text file
-#define DICT_EXPORT_OP 111
+#define DICT_EXPORT_OP 112
 //Invalid dictionary operation
 #define DICT_INVALID_OP 117
 
 typedef int DICT_OP;
 
 
-DICT_OP parse_input(char *);
+DICT_OP parse_input(char *, int *);
 int readline();
 
 #endif

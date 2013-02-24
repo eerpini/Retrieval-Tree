@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 
 #ifndef COMMONDEFS_SEEN
@@ -11,4 +12,12 @@
 #define FAILURE 0
 typedef char bool;
 
+void nullprint(char *, ...);
+
+//DEBUGGING
+#ifdef DEBUG
+#define log printf
+#else
+#define log nullprint
+#endif
 #endif
