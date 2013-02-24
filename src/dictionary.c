@@ -400,6 +400,24 @@ bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
                                                 trie_remove_child(root, *child_to_rm);
                                                 trie_freenode(*child_to_rm);
                                                 *child_to_rm = NULL;
+
+                                                //Reconcile if only one child is remaining
+                                                if(trie_num_children(root) == 1){
+                                                        //There is only one child anyway
+                                                        trienode * merge_child = (trie_get_children(root))[0];
+                                                        void ** moving_children = trie_get_children(merge_child);
+                                                        int merge_num = trie_num_children(merge_child);
+                                                        int j;
+                                                        for(j=0; j < merge_num; j++){
+                                                                trie_remove_child(merge_child, moving_children[i]);
+                                                                trie_add_child(root, moving_children[i]);
+                                                        }
+                                                        //Concatenate strings
+                                                        strjoin(&(root->value), merge_child->value);
+                                                        root->is_word = merge_child->is_word;
+                                                        trie_remove_child(root, merge_child);
+                                                        trie_freenode(merge_child);
+                                                }
                                         }
                                         else{
                                                 log("Got succces with [%s] but did not have to do anything\n", root->value);
@@ -411,6 +429,7 @@ bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
         }
         return FAILURE;
 }
+
 bool remove_word ( dict *dictionary, char *s){
         if(dictionary == NULL || s == NULL){
                 return FAILURE;

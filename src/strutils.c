@@ -60,6 +60,26 @@ char * strsplit (char **str, int pref_len){
         return suffix;
 
 }
+/*
+ * Joins the two strings and puts the result in the first one
+ * To avoid possible out of bounds access, we free the old copy of s1
+ * and assign the newly allocated copy to it
+ * Also returns a pointer to the concatenated string which is the same as *s1
+ */
+
+char * strjoin (char **s1, char *s2){
+        if(s1 == NULL || s2 == NULL){
+                return NULL;
+        }
+
+        char *s = malloc(sizeof(char) * (strlen(*s1) + strlen(s2) + 1));
+
+        strcpy(s, *s1);
+        strcpy(s+strlen(*s1), s2);
+
+        free(*s1);
+        *s1 = s;
+        return s;
+}
+
         
-
-

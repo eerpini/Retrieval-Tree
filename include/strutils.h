@@ -12,5 +12,6 @@
 
 int strcmp2(char *, char *);
 char * strsplit (char **, int);
+char * strjoin (char **, char *);
 
 #endif
