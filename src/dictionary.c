@@ -237,27 +237,27 @@ bool find (dict * dictionary, char * s){
         return FAILURE;
 }
 
-void _fill_strings_recur (trienode * root, void ** strings, int remaining){
+void _fill_strings_recur (trienode * root, void ** strings, int len){
 
         int i;
         void **children ;
+        int running_count = 0;
 
-        for( i=0; i < remaining; i++){
-                strcpy((char *)strings[i] + strlen(strings[i]), root->value);
+        for( i=0; i < len; i++){
+                strcpy((char *)strings[i] + strlen((char*)strings[i]), root->value);
         }
         children  = trie_get_children(root);
         if(children == NULL){
                 return;
         }
+
         if(root->is_word && root->num_strings > 1){
-                for(i=0; i < trie_num_children(root); i++){
-                        _fill_strings_recur( (trienode *)children[i], (void **)((void *)strings + 1), remaining -1);
-                }
+                running_count++;
         }
-        else{
-                for(i=0; i < trie_num_children(root); i++){
-                        _fill_strings_recur( (trienode *)children[i], strings, remaining);
-                }
+
+        for(i=0; i < trie_num_children(root); i++){
+                _fill_strings_recur( (trienode *)children[i], (void **)(strings + running_count), ((trienode *)children[i])->num_strings);
+                running_count +=((trienode *) children[i])->num_strings;
         }
 
         return;
@@ -267,6 +267,7 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
         int i;
         void ** children ;
         int match_index = strcmp2(root->value, s+s_start);
+        int running_count = 0;
         if(match_index == STRCMP_EXACT_MATCH){
                 //Populate string counts and return if 0
                 if(_num_strings_in_subtree_recur(root) == 0){
@@ -284,14 +285,11 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
 
                 children  = trie_get_children(root);
                 if(root->is_word && root->num_strings > 1){
-                        for(i=0; i < trie_num_children(root); i++){
-                                _fill_strings_recur( (trienode *)children[i], (void **)((void *)result->matches + 1), result->len -1);
-                        }
+                        running_count++;
                 }
-                else{
-                        for(i=0; i < trie_num_children(root); i++){
-                                _fill_strings_recur( (trienode *)children[i], result->matches , result->len );
-                        }
+                for(i=0; i < trie_num_children(root); i++){
+                        _fill_strings_recur( (trienode *)children[i], (void **)(result->matches + running_count), ((trienode *)children[i])->num_strings);
+                        running_count += ((trienode *)children[i])->num_strings;
                 }
         }
         else if (match_index == STRCMP_NO_MATCH){
@@ -332,15 +330,13 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
 
                         children  = trie_get_children(root);
                         if(root->is_word && root->num_strings > 1){
-                                for(i=0; i < trie_num_children(root); i++){
-                                        _fill_strings_recur( (trienode *)children[i], (void **)((void *)result->matches + 1), result->len -1);
-                                }
+                                running_count++;
                         }
-                        else{
-                                for(i=0; i < trie_num_children(root); i++){
-                                        _fill_strings_recur( (trienode *)children[i], result->matches , result->len );
-                                }
-                        }       
+                        for(i=0; i < trie_num_children(root); i++){
+                                _fill_strings_recur( (trienode *)children[i], (void **)(result->matches + running_count), ((trienode *)children[i])->num_strings);
+                                running_count += ((trienode *)children[i])->num_strings;
+                        }
+
                 }
         }
         return;
