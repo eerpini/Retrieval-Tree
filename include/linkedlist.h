@@ -15,11 +15,11 @@ typedef struct linkedlist{
         int len;
 }ll;
 
-void free_node(ll_node *);
-ll* create_ll ();
-void free_ll (ll *);
-void add(ll *, void *);
-int remove(ll *, void *);
-void ** get_nodes(ll *);
+void _free_node(ll_node *);
+ll* ll_create();
+void ll_free(ll *);
+void ll_add(ll *, void *);
+int ll_remove(ll *, void *);
+void ** ll_get_nodes(ll *);
 
 #endif

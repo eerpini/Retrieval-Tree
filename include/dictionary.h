@@ -1,5 +1,6 @@
 #include "commondefs.h"
 #include "cmdutils.h"
+#include "trie.h"
 
 #ifndef DICTIONARY_SEEN
 #define DICTIONARY_SEEN

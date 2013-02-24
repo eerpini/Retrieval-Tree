@@ -1,6 +1,6 @@
 #include "linkedlist.h"
 
-void free_node (ll_node * node){
+void _free_node (ll_node * node){
         if(node == NULL){
                 return;
         }
@@ -13,7 +13,7 @@ void free_node (ll_node * node){
         return;
 }
 
-ll* create_ll (){
+ll* ll_create (){
 
         ll * temp = malloc(sizeof(ll));
         temp->head = temp->tail = NULL;
@@ -22,7 +22,7 @@ ll* create_ll (){
         return temp;
 }
 
-void free_ll (ll * list){
+void ll_free (ll * list){
         if(list == NULL){
                 return;
         }
@@ -30,14 +30,14 @@ void free_ll (ll * list){
         ll_node * next = temp;
         while(temp != NULL){
                 next = temp->next;
-                free_node(temp);
+                _free_node(temp);
                 temp = next;
         }
         free(list);
         return;
 }
 
-void add(ll * list, void *data){
+void ll_add(ll * list, void *data){
 
         ll_node *new_node  = malloc(sizeof(ll_node));
         new_node->data = data;
@@ -57,7 +57,7 @@ void add(ll * list, void *data){
         return;
 }
         
-int remove(ll * list , void *data){
+int ll_remove(ll * list , void *data){
 
         if(list->head == NULL){
                 return -1;
@@ -71,7 +71,7 @@ int remove(ll * list , void *data){
                 if(list->head->data == data){
                         temp = list->head;
                         list->head = list->tail = NULL;
-                        free_node(temp);
+                        _free_node(temp);
                         list->len--;
                         return 0;
 
@@ -92,7 +92,7 @@ int remove(ll * list , void *data){
 
         if(temp == list->head){
                 list->head = list->head->next;
-                free_node(temp);
+                _free_node(temp);
                 list->len--;
                 return 0;
         }
@@ -100,13 +100,13 @@ int remove(ll * list , void *data){
         if(temp == list->tail){
                 list->tail = prev;
                 list->tail->next = NULL;
-                free_node(temp);
+                _free_node(temp);
                 list->len--;
                 return 0;
         }
 
         prev->next = temp->next;
-        free_node(temp);
+        _free_node(temp);
         list->len--;
         return 0;
 }
