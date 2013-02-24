@@ -363,4 +363,75 @@ lookup * pfind( dict *dictionary, char *s){
         }
         return temp;
 }
+
+bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
+
+        int i;
+        void ** children ;
+        int match_index = strcmp2(root->value, s);
+        if(match_index == STRCMP_EXACT_MATCH){
+                if(root->is_word){
+                        root->is_word = FALSE;
+                        //Mark the current node for removal if it has no children
+                        if(trie_num_children(root) == 0){
+                                log("Exact match found, setting myself here");
+                                *child_to_rm = root;
+                        }
+                        else{
+                                *child_to_rm = NULL;
+                        }
+                        return SUCCESS;
+                }
+                else{
+                        return FAILURE;
+                }
+        }
+        else if (match_index == STRCMP_NO_MATCH){
+                return FAILURE;
+        }
+        else{
+                if(match_index == strlen(root->value) -1){
+                        children = trie_get_children(root);
+
+                        for (i=0; i< trie_num_children(root); i++){
+                                log("Passing on to the next level with [%s] I have [%s]\n", s+match_index+1, root->value);
+                                if(_remove_recur((trienode *)children[i], s+match_index+1, child_to_rm)){
+                                        if(*child_to_rm != NULL){
+                                                trie_remove_child(root, *child_to_rm);
+                                                trie_freenode(*child_to_rm);
+                                                *child_to_rm = NULL;
+                                        }
+                                        else{
+                                                log("Got succces with [%s] but did not have to do anything\n", root->value);
+                                        }
+                                        return SUCCESS;
+                                }
+                        }
+                }
+        }
+        return FAILURE;
+}
+bool remove_word ( dict *dictionary, char *s){
+        if(dictionary == NULL || s == NULL){
+                return FAILURE;
+        }
+
+        trienode * temp;
+        int i;
+        void ** roots = trie_get_children(dictionary->root);
+        int num_children = trie_num_children(dictionary->root);
+
+        for( i=0; i<num_children; i++){
+                if(_remove_recur((trienode *)roots[i], s, &temp) ){
+                        if(temp != NULL && temp == roots[i]){
+                                trie_remove_child(dictionary->root, temp);
+                                log("Removing the child here");
+                                trie_freenode(temp);
+                        }
+                        return SUCCESS;
+                }
+        }
+        return FAILURE; 
+
+}
        

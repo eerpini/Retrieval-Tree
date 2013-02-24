@@ -46,7 +46,6 @@ void trie_freenode( trienode * node){
         if(node->value != NULL){
                 free(node->value);
         }
-
         free(node);
         return;
 }

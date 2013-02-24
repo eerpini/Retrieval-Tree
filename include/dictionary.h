@@ -24,6 +24,8 @@ bool    _find_recur             (trienode *, char *);
 bool    find                    (dict *, char *);
 lookup *pfind                   (dict *, char *);
 void    _pfind_recur            (trienode *, char *, int, lookup *);
+bool    _remove_recur           (trienode *, char *, trienode **);
+bool    remove_word             (dict *, char *);
 
 
 #endif

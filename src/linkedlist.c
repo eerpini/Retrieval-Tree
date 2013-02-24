@@ -7,9 +7,9 @@ void _free_node (ll_node * node, bool FREE_DATA){
         if(node->data != NULL && FREE_DATA){
                 free(node->data);
         }
-        printf("FREEING THE NODE ATTEMPTED");
+        log("FREEING THE NODE ATTEMPTED");
         free(node);
-        printf("FREEING THE NODE SUCCESSFUL");
+        log("FREEING THE NODE SUCCESSFUL");
         return;
 }
 
@@ -82,8 +82,8 @@ int ll_remove(ll * list , void *data, bool FREE_DATA){
         temp = list->head;
         prev = temp;
         while(temp->data != data && temp != NULL){
-                temp = temp->next;
                 prev = temp;
+                temp = temp->next;
         }
 
         if(temp == NULL){

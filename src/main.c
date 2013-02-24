@@ -38,11 +38,17 @@ int main(int argc, char **argv){
                                         }
                                 }
                                 else{
-                                        printf("No matches found");
+                                        printf("No matches found\n");
                                 }
                                 break;
                         case DICT_REMOVE_OP:
                                 log("Dictionary remove operation found with word : %s\n", input_word);
+                                if(remove_word(mydict, input_word)){
+                                        printf("[%s] deleted\n", input_word);
+                                }
+                                else{
+                                        printf("[%s] not found\n", input_word);
+                                }
                                 break;
                         case DICT_PRINTT_OP:
                                 log("Dictionary printt operation found with word : %s\n", input_word);

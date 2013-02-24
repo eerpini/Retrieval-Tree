@@ -10,3 +10,5 @@ debug:
 clean:
 	rm -r Dictionary Dictionary.dSYM
 	
+test:
+	./Dictionary < test_input

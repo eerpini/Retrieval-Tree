@@ -11,5 +11,10 @@ insert krish
 printt
 lookup saiths
 lookup satish
-lookup mura
+prefix mura
 prefix k
+remove satish kumar eerpini
+printt
+remove murali
+remove krish
+printt
