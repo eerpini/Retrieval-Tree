@@ -6,4 +6,9 @@ void nullprint (char *s, ...){
 
 }
 
-
+void xfree (void * ptr){
+	if(ptr != NULL){
+		free(ptr);
+	}
+	return;
+}

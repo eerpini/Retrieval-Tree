@@ -12,7 +12,8 @@
 #define FAILURE 0
 typedef char bool;
 
-void nullprint(char *, ...);
+void nullprint	(char *, ...);
+void xfree	(void *);
 
 //DEBUGGING
 #ifdef DEBUG
