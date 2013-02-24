@@ -1,4 +1,4 @@
-#include "linkedlist.h"
+#include <linkedlist.h>
 
 void _free_node (ll_node * node, bool FREE_DATA){
         if(node == NULL){
@@ -7,9 +7,7 @@ void _free_node (ll_node * node, bool FREE_DATA){
         if(node->data != NULL && FREE_DATA){
                 free(node->data);
         }
-        log("FREEING THE NODE ATTEMPTED");
         free(node);
-        log("FREEING THE NODE SUCCESSFUL");
         return;
 }
 

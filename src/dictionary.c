@@ -23,8 +23,12 @@ bool _insert_word_recur(trienode * root, char *word, int wlen){
          * if I am a partial match, split myself
          *      push unmatching suffix as new child and parent of my children
          *      push unmatching suffix in word as my new child
+         * if I am a partial match and the input word is a prefix of me - HANDLED by the sub if else block of above
+         *      push my unmatching suffix as a new child and make that the parent of all my children
+         *      make myself a word
          */
         void ** children;
+        int num_children;
         int match_index = strcmp2(word, root->value);
         int my_val_len = strlen(root->value);
         char *suffix;
@@ -34,6 +38,7 @@ bool _insert_word_recur(trienode * root, char *word, int wlen){
                 return FAILURE;
         }
         else if(match_index == STRCMP_EXACT_MATCH){
+                root->is_word = TRUE;
                 return SUCCESS;
         }
         else{
@@ -52,23 +57,27 @@ bool _insert_word_recur(trienode * root, char *word, int wlen){
                 }
                 //Split myself
                 else {
+                        //strsplit resizes the first arg
                         suffix = strsplit(&(root->value), match_index + 1);
                         //create a new child with the suffix
                         newchild = trie_createnode(suffix, strlen(suffix));
+                        free(suffix);
                         children = trie_get_children(root);
-                        for(i = 0; i < trie_num_children(root); i++){
+                        num_children = trie_num_children(root);
+                        for(i = 0; i < num_children; i++){
                                 //remove the child from root and attach to new child
                                 trie_remove_child       (root,     (trienode *)children[i]);
                                 trie_add_child          (newchild, (trienode *)children[i]);
                         }
                         trie_add_child (root, newchild);
+                        newchild->is_word = root->is_word;
+                        root->is_word = FALSE;
                         //Add the unmatching suffix of the input word as a new child
                         if(match_index == wlen - 1){
                                 //The new split root is a word
                                 root->is_word = TRUE;
                         }
                         else{
-                                root->is_word = FALSE;
                                 trie_add_child (root,
                                                trie_createnode(word + match_index +1, wlen - match_index -1));
                         }
@@ -164,6 +173,9 @@ int _num_strings_in_subtree_recur(trienode *root){
         }
         int i = 0;
         void ** children = trie_get_children(root);
+        if(children == NULL && root->is_word){
+                return 1;
+        }
         int count = 0;
 
         for( i=0; i< trie_num_children(root); i++){
@@ -189,7 +201,8 @@ int word_count(dict *dictionary){
                count +=  _num_strings_in_subtree_recur( (trienode *)roots[i]);
                 
         }
-        return (dictionary->root->num_strings = count);
+        dictionary->root->num_strings = count;
+        return count;
 }
 bool _find_recur(trienode * root, char *s){
 
@@ -271,6 +284,7 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
         if(match_index == STRCMP_EXACT_MATCH){
                 //Populate string counts and return if 0
                 if(_num_strings_in_subtree_recur(root) == 0){
+                        printf("THIS SHOUD NOT HAPPEND\n");
                         return;
                 }
                 
@@ -294,6 +308,7 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
         }
         else if (match_index == STRCMP_NO_MATCH){
                 log("No match found for %s at node %s\n", s+s_start, root->value);
+                log("Returning becase no match was found for [%s] and word [%s] for segment %s\n", root->value, s, s + s_start);
                 return;
         }
         else{
@@ -304,9 +319,12 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
                         children = trie_get_children(root);
 
                         for (i=0; i< trie_num_children(root); i++){
-                                _pfind_recur((trienode *)children[i], s, match_index+1, result);
+                                _pfind_recur((trienode *)children[i], s, s_start + match_index+1, result);
+                                if(result->len > 0){
                                         return ;
+                                }
                         }
+                        log("Returning becase children did not have anything for [%s] and word [%s] for segment %s\n", root->value, s, s + s_start);
                         return;
                 }
                 else if(match_index +1  == strlen(s) - s_start){
@@ -314,6 +332,7 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
                         //if the passed prefix from above was a prefix of root->value
                          //Populate string counts and return if 0
                         if(_num_strings_in_subtree_recur(root) == 0){
+                                log("Returning becase num_strings is 0 for [%s] and word [%s] for segment %s\n", root->value, s, s + s_start);
                                 return;
                         }
                         
@@ -336,6 +355,8 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
                                 _fill_strings_recur( (trienode *)children[i], (void **)(result->matches + running_count), ((trienode *)children[i])->num_strings);
                                 running_count += ((trienode *)children[i])->num_strings;
                         }
+
+                        return;
 
                 }
         }
@@ -367,6 +388,7 @@ lookup * pfind( dict *dictionary, char *s){
 bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
 
         int i;
+        int num_children;
         void ** children ;
         int match_index = strcmp2(root->value, s);
         if(match_index == STRCMP_EXACT_MATCH){
@@ -392,7 +414,7 @@ bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
         else{
                 if(match_index == strlen(root->value) -1){
                         children = trie_get_children(root);
-
+                        num_children = trie_num_children(root);
                         for (i=0; i< trie_num_children(root); i++){
                                 log("Passing on to the next level with [%s] I have [%s]\n", s+match_index+1, root->value);
                                 if(_remove_recur((trienode *)children[i], s+match_index+1, child_to_rm)){
@@ -402,7 +424,7 @@ bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
                                                 *child_to_rm = NULL;
 
                                                 //Reconcile if only one child is remaining
-                                                if(trie_num_children(root) == 1){
+                                                if(trie_num_children(root) == 1 && !root->is_word){
                                                         //There is only one child anyway
                                                         trienode * merge_child = (trie_get_children(root))[0];
                                                         void ** moving_children = trie_get_children(merge_child);
