@@ -8,7 +8,7 @@ debug:
 	$(CC) -g $(PROGS) -o Dictionary -I./include/ -DDEBUG
 
 clean:
-	rm -r Dictionary Dictionary.dSYM
+	rm -f Dictionary Dictionary.dSYM
 	
 test:
 	./Dictionary < test_input

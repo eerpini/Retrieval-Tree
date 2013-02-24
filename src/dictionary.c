@@ -63,7 +63,7 @@ bool _insert_word_recur(trienode * root, char *word, int wlen){
                         suffix = strsplit(&(root->value), match_index + 1);
                         //create a new child with the suffix
                         newchild = trie_createnode(suffix, strlen(suffix));
-                        xfree(suffix);
+			xfree(suffix);
                         children = trie_get_children(root);
                         num_children = trie_num_children(root);
                         for(i = 0; i < num_children; i++){
@@ -196,6 +196,7 @@ int _num_strings_in_subtree_recur(trienode *root){
         else{
                 root->num_strings = count;
         }
+
 	xfree(children);
         return root->num_strings;
 }
@@ -336,6 +337,7 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
                         for (i=0; i< trie_num_children(root); i++){
                                 _pfind_recur((trienode *)children[i], s, s_start + match_index+1, result);
                                 if(result->len > 0){
+					xfree(children);
                                         return ;
                                 }
                         }
@@ -495,11 +497,13 @@ bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
                                         else{
                                                 log("Got succces with [%s] but did not have to do anything\n", root->value);
                                         }
+					xfree(children);
                                         return SUCCESS;
                                 }
                         }
                 }
         }
+	xfree(children);
         return FAILURE;
 }
 
