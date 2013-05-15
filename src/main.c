@@ -64,7 +64,6 @@ int main(int argc, char **argv){
                         printf("> ");
                 }
         }
-	xfree(input_word);
-
+        xfree(input_word);
         return EXIT_SUCCESS;
 }

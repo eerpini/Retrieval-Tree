@@ -48,13 +48,13 @@ bool _insert_word_recur(trienode * root, char *word, int wlen){
                         for(i = 0; i < trie_num_children(root); i++){
                                 if( _insert_word_recur( (trienode *)children[i], 
                                                         word + my_val_len, wlen - my_val_len)){
-					xfree(children);
+                    xfree(children);
                                         return SUCCESS;
                                 }
                         }
                         trie_add_child( root, 
                                         trie_createnode (word + my_val_len, wlen - my_val_len));
-			xfree(children);
+            xfree(children);
                         return SUCCESS;
                 }
                 //Split myself
@@ -63,7 +63,7 @@ bool _insert_word_recur(trienode * root, char *word, int wlen){
                         suffix = strsplit(&(root->value), match_index + 1);
                         //create a new child with the suffix
                         newchild = trie_createnode(suffix, strlen(suffix));
-			xfree(suffix);
+            xfree(suffix);
                         children = trie_get_children(root);
                         num_children = trie_num_children(root);
                         for(i = 0; i < num_children; i++){
@@ -83,7 +83,7 @@ bool _insert_word_recur(trienode * root, char *word, int wlen){
                                 trie_add_child (root,
                                                trie_createnode(word + match_index +1, wlen - match_index -1));
                         }
-			xfree(children);
+            xfree(children);
                         return SUCCESS;
 
                 }
@@ -107,14 +107,14 @@ bool insert(dict * dictionary, char *word, int wlen){
         for( i=0; i< num_children; i++){
                 if(_insert_word_recur( (trienode *)roots[i],
                                         word, wlen)){
-			xfree(roots);
+            xfree(roots);
                         return SUCCESS;
                 }
         }
 
         trie_add_child(dictionary->root, 
                         trie_createnode(word, wlen));
-	xfree(roots);
+    xfree(roots);
         return SUCCESS;
         
 }
@@ -141,7 +141,7 @@ void _print_words_recur( trienode * root, int indent){
                 _print_words_recur( (trienode *)children[i], indent + 1);
         }
 
-	xfree(children);
+    xfree(children);
         return;
 }
 
@@ -167,7 +167,7 @@ void print (dict *dictionary){
                 
         }
 
-	xfree(roots);
+    xfree(roots);
         return;
 }
 
@@ -197,7 +197,7 @@ int _num_strings_in_subtree_recur(trienode *root){
                 root->num_strings = count;
         }
 
-	xfree(children);
+    xfree(children);
         return root->num_strings;
 }
 
@@ -213,7 +213,7 @@ int word_count(dict *dictionary){
         }
         dictionary->root->num_strings = count;
 
-	xfree(roots);
+    xfree(roots);
         return count;
 }
 bool _find_recur(trienode * root, char *s){
@@ -236,13 +236,13 @@ bool _find_recur(trienode * root, char *s){
 
                         for (i=0; i< trie_num_children(root); i++){
                                 if(_find_recur((trienode *)children[i], s+match_index+1)){
-					xfree(children);
+                    xfree(children);
                                         return SUCCESS;
                                 }
                         }
                 }
         }
-	xfree(children);
+    xfree(children);
         return FAILURE;
 
 }
@@ -258,11 +258,11 @@ bool find (dict * dictionary, char * s){
 
         for( i=0; i<num_children; i++){
                 if(_find_recur((trienode *)roots[i], s)){
-			xfree(roots);
+            xfree(roots);
                         return SUCCESS;
                 }
         }
-	xfree(roots);
+    xfree(roots);
         return FAILURE;
 }
 
@@ -288,7 +288,7 @@ void _fill_strings_recur (trienode * root, void ** strings, int len){
                 _fill_strings_recur( (trienode *)children[i], (void **)(strings + running_count), ((trienode *)children[i])->num_strings);
                 running_count +=((trienode *) children[i])->num_strings;
         }
-	xfree(children);
+    xfree(children);
         return;
 }
 
@@ -337,12 +337,12 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
                         for (i=0; i< trie_num_children(root); i++){
                                 _pfind_recur((trienode *)children[i], s, s_start + match_index+1, result);
                                 if(result->len > 0){
-					xfree(children);
+                                        xfree(children);
                                         return ;
                                 }
                         }
                         log("Returning becase children did not have anything for [%s] and word [%s] for segment %s\n", root->value, s, s + s_start);
-			xfree(children);
+                        xfree(children);
                         return;
                 }
                 else if(match_index +1  == strlen(s) - s_start){
@@ -373,13 +373,12 @@ void _pfind_recur(trienode * root, char *s, int s_start, lookup * result){
                                 _fill_strings_recur( (trienode *)children[i], (void **)(result->matches + running_count), ((trienode *)children[i])->num_strings);
                                 running_count += ((trienode *)children[i])->num_strings;
                         }
-			xfree(children);
-
+                        xfree(children);
                         return;
 
                 }
         }
-	xfree(children);
+        xfree(children);
         return;
 
 }
@@ -399,11 +398,11 @@ lookup * pfind( dict *dictionary, char *s){
         for( i=0; i<num_children; i++){
                 _pfind_recur((trienode *)roots[i], s, 0, temp);
                 if(temp->len > 0){
-			xfree(roots);
+                        xfree(roots);
                         return temp;
                 }
         }
-	xfree(roots);
+        xfree(roots);
         return temp;
 }
 
@@ -428,7 +427,7 @@ bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
                         }
                         else if (num_children == 1){
                                 //Reconcile 
-                                merge_children = trie_get_children(root);	
+                                merge_children = trie_get_children(root);    
                                 merge_child = merge_children[0];
                                 moving_children = trie_get_children(merge_child);
                                 merge_num = trie_num_children(merge_child);
@@ -474,7 +473,7 @@ bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
                                                 //Reconcile if only one child is remaining
                                                 if(trie_num_children(root) == 1 && !root->is_word){
                                                         //There is only one child anyway
-						 	void ** merge_children = trie_get_children(root);	
+                             void ** merge_children = trie_get_children(root);    
                                                         trienode * merge_child = merge_children[0];
                                                         void ** moving_children = trie_get_children(merge_child);
                                                         int merge_num = trie_num_children(merge_child);
@@ -490,20 +489,20 @@ bool _remove_recur(trienode * root, char *s, trienode **child_to_rm){
                                                         root->is_word = merge_child->is_word;
                                                         trie_remove_child(root, merge_child);
                                                         trie_freenode(merge_child);
-							xfree(merge_children);
-							xfree(moving_children);
+                                                        xfree(merge_children);
+                                                        xfree(moving_children);
                                                 }
                                         }
                                         else{
                                                 log("Got succces with [%s] but did not have to do anything\n", root->value);
                                         }
-					xfree(children);
+                                        xfree(children);
                                         return SUCCESS;
                                 }
                         }
                 }
         }
-	xfree(children);
+        xfree(children);
         return FAILURE;
 }
 
@@ -524,12 +523,11 @@ bool remove_word ( dict *dictionary, char *s){
                                 log("Removing the child here");
                                 trie_freenode(temp);
                         }
-			xfree(roots);
+                        xfree(roots);
                         return SUCCESS;
                 }
         }
-	xfree(roots);
+        xfree(roots);
         return FAILURE; 
 
 }
-       
