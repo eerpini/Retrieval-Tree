@@ -11,29 +11,29 @@
  * Return -1 if no match was found at all
  */
 int strcmp2(char *s1, char *s2){
-        if(s1 == NULL || s2 == NULL){
-                return STRCMP_NO_MATCH;
+    if(s1 == NULL || s2 == NULL){
+        return STRCMP_NO_MATCH;
+    }
+    int len1 = strlen(s1);
+    int len2 = strlen(s2);
+    int i = 0;
+    while(i < len1 && i < len2){
+        if(s1[i] != s2[i]){
+            break;
         }
-        int len1 = strlen(s1);
-        int len2 = strlen(s2);
-        int i = 0;
-        while(i < len1 && i < len2){
-                if(s1[i] != s2[i]){
-                        break;
-                }
-                i++;
-        }
+        i++;
+    }
 
-        //No matching character
-        if(i == 0){
-                return STRCMP_NO_MATCH;
-        }
-        //Lens are equal and all match
-        if(i == len1 && i == len2){
-                return STRCMP_EXACT_MATCH;
-        }
-        //Partial match
-        return i-1;
+    //No matching character
+    if(i == 0){
+        return STRCMP_NO_MATCH;
+    }
+    //Lens are equal and all match
+    if(i == len1 && i == len2){
+        return STRCMP_EXACT_MATCH;
+    }
+    //Partial match
+    return i-1;
 
 }
 /*
@@ -43,21 +43,21 @@ int strcmp2(char *s1, char *s2){
  * all strings are null terminated
  */
 char * strsplit (char **str, int pref_len){
-        int curr_len = strlen(*str);
-        
-        char * prefix = malloc (sizeof(char) * (pref_len + 1));
-        char * suffix = malloc (sizeof(char) * (curr_len - pref_len + 1));
+    int curr_len = strlen(*str);
 
-        strncpy(prefix, *str, pref_len);
-        prefix[pref_len] = 0;
+    char * prefix = malloc (sizeof(char) * (pref_len + 1));
+    char * suffix = malloc (sizeof(char) * (curr_len - pref_len + 1));
 
-        strncpy(suffix, (*str)+pref_len, curr_len - pref_len);
-        suffix[curr_len - pref_len] = 0;
+    strncpy(prefix, *str, pref_len);
+    prefix[pref_len] = 0;
 
-        free(*str);
-        *str = prefix;
+    strncpy(suffix, (*str)+pref_len, curr_len - pref_len);
+    suffix[curr_len - pref_len] = 0;
 
-        return suffix;
+    free(*str);
+    *str = prefix;
+
+    return suffix;
 
 }
 /*
@@ -68,18 +68,16 @@ char * strsplit (char **str, int pref_len){
  */
 
 char * strjoin (char **s1, char *s2){
-        if(s1 == NULL || s2 == NULL){
-                return NULL;
-        }
+    if(s1 == NULL || s2 == NULL){
+        return NULL;
+    }
 
-        char *s = malloc(sizeof(char) * (strlen(*s1) + strlen(s2) + 1));
+    char *s = malloc(sizeof(char) * (strlen(*s1) + strlen(s2) + 1));
 
-        strcpy(s, *s1);
-        strcpy(s+strlen(*s1), s2);
+    strcpy(s, *s1);
+    strcpy(s+strlen(*s1), s2);
 
-        free(*s1);
-        *s1 = s;
-        return s;
+    free(*s1);
+    *s1 = s;
+    return s;
 }
-
-        

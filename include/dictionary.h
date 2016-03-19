@@ -6,10 +6,9 @@
 #define DICTIONARY_SEEN
 
 #define MAX_WORD_SIZE (1024 - 6 -1) 
-
 typedef struct prefix_lookup {
-        int len;
-        void ** matches;
+    int len;
+    void ** matches;
 }lookup;
 
 dict *  new_dictionary          ();
@@ -26,6 +25,4 @@ lookup *pfind                   (dict *, char *);
 void    _pfind_recur            (trienode *, char *, int, lookup *);
 bool    _remove_recur           (trienode *, char *, trienode **);
 bool    remove_word             (dict *, char *);
-
-
 #endif
